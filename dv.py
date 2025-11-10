@@ -42,7 +42,7 @@ def main():
                 filename = parts[2]
                 update_interval = int(parts[4])
                 build_initial_table(filename)
-                print(server_id)
+                # print(server_id)
                 thread1 = threading.Thread(target=handle_updates, daemon=True)
                 thread1.start()
                 thread2 = threading.Thread(target=periodic_step, daemon=True)
@@ -120,10 +120,10 @@ def periodic_step():
                     to_disable.append(neighbor)
         for server in to_disable:
             disable(server)
-            print("disabled " + str(server))
+            # print("disabled " + str(server))
         with lock:
             update_index += 1
-        print(distances)
+        # print(distances)
         time.sleep(update_interval)
 
 def step():
@@ -177,6 +177,7 @@ def handle_updates():
 
             from_server = int(parts[0])
             
+            cost = parts[2]
             if cost == "inf":
                 cost = math.inf
             else:
@@ -184,17 +185,20 @@ def handle_updates():
 
             with lock:
                 neighbor_edges[from_server] = cost
+
+                if distances[from_server][0] == from_server and cost > distances[from_server][1]:
+                    distances[from_server] = (from_server, cost)
                 # s.sendto("Message SUCCESS".encode(), address)
 
-            print(neighbor_edges)
+            # print(neighbor_edges)
         
         else:
             recv_distances = message["distances"]
             # perform Bellman-Ford
             neighbor_id = message["id"]
 
-            print("my distances: ")
-            print(distances)
+            # print("my distances: ")
+            # print(distances)
 
             with lock:
                 for server, min_path in recv_distances.items():
@@ -260,8 +264,8 @@ def build_initial_table(filename):
         distances[server_id] = (server_id, 0)
         _, port = ip_ports[server_id]
 
-        print(ip_ports)
-        print(distances)
+        # print(ip_ports)
+        # print(distances)
 
 def disable(target_id):
     
