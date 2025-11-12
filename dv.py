@@ -47,6 +47,8 @@ def main():
                 thread1.start()
                 thread2 = threading.Thread(target=periodic_step, daemon=True)
                 thread2.start()
+            elif command == "myip":
+                print(get_ip())
             elif command == "update":
                 dest_id = int(parts[2])
                 dest_ip, dest_port = ip_ports[dest_id]
@@ -62,12 +64,24 @@ def main():
             elif command == "disable":
                 target_id = int(parts[1])
                 disable(target_id)
-            else:
+            elif command == "crash":
                 print("Bye!")
                 sys.exit(0)
+            else:
+                print("Unknown command")
                 
         except Exception as e:
             print(f"Error: {e}")
+
+def get_ip():
+    # create a UDP socket for quick, limited-overhead connection to google DNS
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    # connect to google ip
+    s.connect(("8.8.8.8", 80))
+    # extract the ip address
+    ip = s.getsockname()[0]
+    s.close()
+    return ip
 
 def update(dest_ip, dest_port, cost_update):
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
